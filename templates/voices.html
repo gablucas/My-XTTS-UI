@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Interface</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="../static/styles/voices.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
+</head>
+<body>
+    <header>
+        <a href="/">Gerar Audio</a>
+        <a href="/">Vozes</a>
+        <a href="/">Audio Presets</a>
+    </header>
+
+    <div class="container">
+        <div class="configs-container">
+            <div class="input-container">
+                <label for="text">Enter Text</label>
+                <input type="text" id="text">
+            </div>
+            
+            <div class="drop-area upload-audio-container" id="dropArea">
+                <p>Arraste e solte um arquivo WAV aqui ou clique para selecionar.</p>
+                <input type="file" name="file" id="fileInput" accept=".wav">
+            </div>
+        </div>
+
+        <h1>Lista de Áudios</h1>
+        <div class="audio-list-container">
+            <div class="audio-list-actions">
+                <button id="deleteAllAudios">Excluir tudo</button>
+                <button onclick="generateSpeech()">Melhorar audios</button>
+            </div>
+
+            <div class="audio-files-container">
+                <div id="audio-list-generated"></div>
+                <div id="audio-list-enhanced"></div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script type="module" src="/static/scripts/voices.js"></script>
+</body>
+</html>
