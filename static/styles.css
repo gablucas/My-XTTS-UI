@@ -1,0 +1,158 @@
+html {
+    overflow-y: scroll;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    font-family: Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0 20px;
+    color: #FFFFFF;
+    background-color: #262627;
+}
+
+input,
+select {
+    padding: 8px;
+    border-radius: 7px;
+    background-color: #262627;
+    outline: none;
+    color: #FFFFFF;
+}
+
+button {
+    padding: 12px;
+    border: 1px solid #748180;
+    border-radius: 7px;
+    color: #ECF462;
+    background-color: #363636;
+}
+
+audio {
+    background-color: #363636;
+    border-radius: 7px;
+    border: 1px solid #ccc;
+    margin: 10px;
+    padding: 5px;
+}
+
+a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+
+.hide {
+    display: none !important;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.wrapper-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.wrapper-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+header {
+    display: flex;
+    border-bottom: 1px solid #748180;
+    background: linear-gradient(#404040, #353535);
+}
+
+header a {
+    padding: 24px 12px;
+    border-right: 1px solid #748180;
+}
+
+.container {
+    display: flex;
+    margin: 0 auto;
+    flex-direction: column;
+    width: 1000px;
+}
+
+.configs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.configs-container .upload-audio-container {
+    grid-column: 1/-1;
+    text-align: center;
+}
+
+.drop-area {
+    padding: 24px;
+    border: 1px solid #748180;
+    border-radius: 7px;
+    background-color: #363636;
+    cursor: pointer;
+}
+
+.drop-area p {
+    margin: 0;
+}
+
+.drop-area input[type="file"] {
+    display: none;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border: 1px solid #748180;
+    border-radius: 7px;
+    background-color: #363636;
+}
+
+.audio-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.audio-files-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    padding: 12px;
+    border: 4px solid #748180;
+    border-radius: 7px;
+    background-color: #363636;
+    min-height: 100px;
+}
+
+.audio-files-container > div {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.audio-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px;
+    border: 1px solid #748180;
+    border-radius: 7px;
+    background-color: #505050;
+}
+
+.audio-container .audio-button-play,
+.audio-container .audio-button-pause {
+    cursor: pointer;
+}

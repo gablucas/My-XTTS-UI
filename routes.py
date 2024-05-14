@@ -9,6 +9,3 @@ def index():
 @main.route('/voices')
 def voices():
     return render_template('voices.html')
-
-
-from controllers import controller
