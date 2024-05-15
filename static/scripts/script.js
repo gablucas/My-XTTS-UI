@@ -35,7 +35,6 @@ export async function getAudioFiles(directory) {
 }
 
 export function showAudiosFiles(audiosData) {
-    console.log(audiosData)
     const generatedAudioList = document.getElementById('audio-list-generated');
     const enhancedAudioList = document.getElementById('audio-list-enhanced');
 
@@ -47,32 +46,38 @@ export function showAudiosFiles(audiosData) {
         const path = audioData['audio_path'];
 
         const audioContainer = document.createElement('div');
-        const audioName = document.createElement('span');
-
-        const audioPlay = document.createElement('span');
-        const audioPause = document.createElement('span');
-        const audioDelete = document.createElement('span');
-
-        const audio = new Audio(path);
         audioContainer.classList.add(name, "audio-container");
 
-        audio.controls = true;
+        const audioActionsContainer = document.createElement('div');
+        audioActionsContainer.classList.add("audio-actions");
+
+        const audioName = document.createElement('span');
         audioName.innerHTML = name;
+        
+        const audioPlay = document.createElement('span');
         audioPlay.classList.add("audio-button-play", "material-symbols-outlined");
-        audioPause.classList.add("audio-button-pause", "hide", "material-symbols-outlined");
-        audioDelete.classList.add("audio-button-delete", "material-symbols-outlined");
         audioPlay.innerHTML = "play_arrow";
-        audioPause.innerHTML = "pause";
-        audioDelete.innerHTML = "delete";
-
         audioPlay.addEventListener('click', (e) => toggleAudio(audio, name, "play"))
+        
+        const audioPause = document.createElement('span');
+        audioPause.classList.add("audio-button-pause", "hide", "material-symbols-outlined");
+        audioPause.innerHTML = "pause";
         audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"))
-        audioDelete.addEventListener('click', async () => await deleteAudio(audioData.id, audioData.audio_path))
 
+        const audioDelete = document.createElement('span');
+        audioDelete.classList.add("audio-button-delete", "material-symbols-outlined");
+        audioDelete.innerHTML = "delete";
+        audioDelete.addEventListener('click', async () => await deleteAudio(audioData.id, audioData.audio_path))
+        
+        const audio = new Audio(path);
+        audio.controls = true;
+        
+
+        audioActionsContainer.appendChild(audioPlay);
+        audioActionsContainer.appendChild(audioPause);
+        audioActionsContainer.append(audioDelete);
         audioContainer.appendChild(audioName);
-        audioContainer.appendChild(audioPlay);
-        audioContainer.appendChild(audioPause);
-        audioContainer.append(audioDelete);
+        audioContainer.appendChild(audioActionsContainer);
 
         if (name.includes('enhanced')) {
             enhancedAudioList.appendChild(audioContainer);
@@ -98,4 +103,10 @@ export function deleteAllAudioFiles(deletePath, filtros) {
     .catch(error => {
         console.error('Erro:', error);
     });
+}
+
+export async function getAudios() {
+    const response = await fetch("/audio_files")
+    const data =  await response.json();
+    return data;
 }

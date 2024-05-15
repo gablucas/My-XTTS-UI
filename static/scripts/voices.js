@@ -1,7 +1,5 @@
-import './dropDownInput.js';
-import './script.js';
-import { generateSpeech, getAudioFiles, showAudiosFiles, deleteAllAudioFiles } from './script.js';
 
+/*
 export async function listVoices(e) {
 
     const files = e.dataTransfer.files;
@@ -39,13 +37,58 @@ export async function listVoices(e) {
     audiosData = audiosData.filter(x => x.file_name.includes("temporary"));
     showAudiosFiles(audiosData);
 }
+*/
+//const audioPlayer = document.getElementById('audioPlayer');
+
+const newVoicesContainer = document.getElementById('new-voices-container');
+
+
+function teste(e) {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    console.log(files)
+
+    Array.from(files).forEach(x => {
+        const voiceContainer = document.createElement("div");
+        voiceContainer.classList.add("voice-container");
+
+        const wrapperInputAndName = document.createElement("div");
+        wrapperInputAndName.classList.add("inputAndName");
+
+        const checkBox = document.createElement('input');
+        checkBox.setAttribute("type", "checkbox");
+
+        const voiceName = document.createElement('span');
+        voiceName.innerHTML = x.name.split(".wav")[0];
+
+        wrapperInputAndName.appendChild(checkBox);
+        wrapperInputAndName.appendChild(voiceName);
+
+        voiceContainer.appendChild(wrapperInputAndName);
+        newVoicesContainer.appendChild(voiceContainer);
+    });
+
+    /*
+    const fileURL = URL.createObjectURL(file);
+    audioPlayer.src = fileURL;
+    */
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+}
 
 const dropArea = document.getElementById('dropArea');
-dropArea.addEventListener('drop', (e) => listVoices(e));
+dropArea.addEventListener('drop', (e) => teste(e));
+dropArea.addEventListener('dragover', handleDragOver);
 
+
+
+/*
 let audiosData = await getAudioFiles("static/output/audios");
 audiosData = audiosData.filter(x => x.file_name.includes("temporary"));
 showAudiosFiles(audiosData);
 
 const deleteAllAudiosBtn = document.getElementById("deleteAllAudios");
-deleteAllAudiosBtn.addEventListener('click', () => deleteAllAudioFiles('E:\\TTS\\static\\output\\audios\\', [['temporary', ""]]))
+//deleteAllAudiosBtn.addEventListener('click', () => deleteAllAudioFiles('E:\\TTS\\static\\output\\audios\\', [['temporary', ""]]))
+*/

@@ -1,24 +1,12 @@
-import {getAudioFiles, showAudiosFiles, deleteAllAudioFiles } from './script.js';
+import { getAudioFiles, showAudiosFiles, getAudios } from './script.js';
 
 const generateBtn = document.getElementById("generateAudio");
-const deleteAllAudiosBtn = document.getElementById("deleteAllAudios");
 const voicesSelect = document.getElementById('voices');
+const filterVoice = document.getElementById('filter_voice');
+const filterText = document.getElementById('filter_text');
 
-generateBtn.addEventListener("click", async () => await generateAndGetAudiosFiles());
-
-let voicesData = await getAudioFiles('static/output/voices');
-voicesData = voicesData.filter(x => !x.file_name.includes("temporary"));
-voicesData.forEach(audioData => {
-    const name = audioData['file_name'].split(".wav")[0];
-    const path = audioData['file_path'];
-
-    const voiceOption = document.createElement('option');
-
-    voiceOption.innerHTML = name;
-    voiceOption.value = name;
-
-    voicesSelect.appendChild(voiceOption);
-})
+const audiosData = await getAudios();
+export let filterAudiosData = audiosData;
 
 async function generateSpeech(voices) {
     var voices = document.getElementById("voices").value;
@@ -48,18 +36,6 @@ async function generateSpeech(voices) {
     }
 }
 
-async function generateAndGetAudiosFiles() {
-    await generateSpeech();
-    await GetAudiosAndShow();
-}
-
-async function GetAudiosAndShow() {
-    const response = await fetch("/audio_files")
-    const data =  await response.json();
-    const audiosData = data.filter(x => !x.audio_name.includes("temporary"));
-    showAudiosFiles(audiosData);
-}
-
 export async function deleteAudio(id, audio_path) {
     const response = await fetch("/audio_files", {
         method: "DELETE",
@@ -72,7 +48,86 @@ export async function deleteAudio(id, audio_path) {
     await GetAudiosAndShow();
 }
 
+function filter(e, type) {
+    const value = e.target.value;
+    console.log(filterAudiosData)
 
-await GetAudiosAndShow();
+    if (type === "voice_name") {
+        if (value === "all") {
+            filterAudiosData = audiosData;
+        } else {
+            filterAudiosData = audiosData.filter(x => x[type] === value);
+        }
 
-deleteAllAudiosBtn.addEventListener('click', () => deleteAllAudioFiles('E:\\TTS\\static\\output\\audios\\', [['temporary', "not"]]))
+        ListTextsFilter();
+     }
+
+     if (type === "audio_text") {
+        if (value === "all") {
+            filterAudiosData = audiosData;
+        } else {
+            filterAudiosData = audiosData.filter(x => x[type] === value);
+        }
+     }
+
+
+    filterAudiosData.filter(x => !x.voice_name.includes("temporary"));
+
+    showAudiosFiles(filterAudiosData);
+}
+
+async function ListAudios() {
+    let voicesData = await getAudioFiles('static/output/voices');
+    voicesData = voicesData.filter(x => !x.file_name.includes("temporary"));
+    voicesData.forEach(audioData => {
+        const name = audioData['file_name'].split(".wav")[0];
+        const path = audioData['file_path'];
+        
+        const voiceOption = document.createElement('option');
+        
+        voiceOption.innerHTML = name;
+        voiceOption.value = name;
+        
+        voicesSelect.appendChild(voiceOption);
+    })
+    
+}
+
+async function ListVoicesFilter() {
+    filterVoice.innerHTML = "<option value='all'>All</option>";
+
+    const uniqueVoicesName = Array.from(new Set(audiosData.map(x => x.voice_name)));
+
+    uniqueVoicesName.forEach(data => {
+        const filterVoiceOption = document.createElement('option');
+        filterVoiceOption.setAttribute("value", data);
+        filterVoiceOption.innerHTML = data;
+        filterVoice.appendChild(filterVoiceOption);
+    })
+}
+
+async function ListTextsFilter() {
+    filterText.innerHTML = "<option value='all'>All</option>";
+
+    const uniqueTextsName = Array.from(new Set(filterAudiosData.map(x => x.audio_text)));
+
+    uniqueTextsName.forEach(data => {
+        const filterTextOption = document.createElement('option');
+        filterTextOption.setAttribute("value", data);
+        filterTextOption.innerHTML = data;
+        filterText.appendChild(filterTextOption);
+    })
+}
+
+await ListAudios();
+await ListVoicesFilter();
+await ListTextsFilter();
+
+
+//showAudiosFiles(filterAudiosData);
+
+
+filterVoice.addEventListener("change", (e) => filter(e, "voice_name"));
+filterText.addEventListener("change", (e) => filter(e, "audio_text"));
+generateBtn.addEventListener("click", async () => await generateAndGetAudiosFiles());
+//deleteAllAudiosBtn.addEventListener('click', () => deleteAllAudioFiles('E:\\TTS\\static\\output\\audios\\', [['temporary', "not"]]))
