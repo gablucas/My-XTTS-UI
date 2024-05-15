@@ -2,4 +2,4 @@ __pycache__/
 .venv/
 helpers/
 XTTS.db
-static/output/
+static/
