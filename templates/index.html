@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TTS Interface</title>
     <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="../static/styles/audios.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
 </head>
 <body>
@@ -18,31 +19,31 @@
         <div class="configs-container">
             <div class="wrapper-3">
 
-                <div class="input-container">
+                <div class="input-container primary-container">
                     <label for="voices">Select Voice</label>
                     <select id="voices">
                     </select>
                 </div>
     
-                <div class="input-container">
+                <div class="input-container primary-container">
                     <label for="emotion">Select Emotion</label>
                     <select id="emotion">
                         <option value="happysouls_1">Normal</option>
                     </select>
                 </div>
         
-                <div class="input-container">
+                <div class="input-container primary-container">
                     <label for="number">Repeat Times</label>
                     <input type="number" id="number" value="1">
                 </div>
             </div>
     
-            <div class="input-container">
+            <div class="input-container primary-container">
                 <label for="text">Enter Text</label>
                 <input type="text" id="text">
             </div>
         
-            <div class="wrapper-2">
+            <div class="wrapper">
                 <button id="generateAudio">Gerar fala(s)</button>
             </div>
             
@@ -50,13 +51,27 @@
     
         <h1>Lista de Áudios</h1>
     
+
+
         <div class="audio-list-container">
-            <div class="audio-list-actions">
-                <button id="deleteAllAudios">Excluir tudo</button>
-                <button onclick="generateSpeech()">Melhorar audios</button>
+            <div class="primary-container filter">
+
+                <div class="input-container">
+                    <label for="filter_voice">Voice</label>
+                    <select id="filter_voice">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                
+                <div class="input-container">
+                    <label for="filter_text">Select Text</label>
+                    <select id="filter_text">
+                        <option value="all">All</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="audio-files-container">
+            <div class="audio-files-container secondary-container">
                 <div id="audio-list-generated"></div>
                 <div id="audio-list-enhanced"></div>
             </div>

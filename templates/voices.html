@@ -11,33 +11,31 @@
 <body>
     <header>
         <a href="/">Gerar Audio</a>
-        <a href="/">Vozes</a>
+        <a href="/voices">Vozes</a>
         <a href="/">Audio Presets</a>
     </header>
 
     <div class="container">
         <div class="configs-container">
-            <div class="input-container">
-                <label for="text">Enter Text</label>
-                <input type="text" id="text">
-            </div>
-            
             <div class="drop-area upload-audio-container" id="dropArea">
-                <p>Arraste e solte um arquivo WAV aqui ou clique para selecionar.</p>
+                <label for="fileInput">Arraste e solte um arquivo WAV aqui ou clique para selecionar.</label>
                 <input type="file" name="file" id="fileInput" accept=".wav">
             </div>
         </div>
 
         <h1>Lista de Áudios</h1>
         <div class="audio-list-container">
-            <div class="audio-list-actions">
-                <button id="deleteAllAudios">Excluir tudo</button>
-                <button onclick="generateSpeech()">Melhorar audios</button>
+
+            <div class="primary-container">
+                <label for="text">Enter Text</label>
+
+                <div class="input-container text">
+                    <input type="text" id="text">
+                    <button>Gerar vozes</button>
+                </div>
             </div>
 
-            <div class="audio-files-container">
-                <div id="audio-list-generated"></div>
-                <div id="audio-list-enhanced"></div>
+            <div id="new-voices-container" class="secondary-container">
             </div>
         </div>
         
