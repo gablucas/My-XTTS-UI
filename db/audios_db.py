@@ -2,13 +2,13 @@
 import sqlite3
 from config import Config
 
-def save_audio(voice_name, audio_text, audio_name, audio_path):
+def save_audio_db(audio_name, audio_text, audio_path, audio_type, voice_name):
     conn = sqlite3.connect(Config.DATABASE)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO audio_files (voice_name, audio_text, audio_name, audio_path)
-        VALUES (?, ?, ?, ?)
-    ''', (voice_name, audio_text, audio_name, audio_path))
+        INSERT INTO audio_files (audio_name, audio_text, audio_path, audio_type, voice_name)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (audio_name, audio_text, audio_path, audio_type, voice_name))
     conn.commit()
     conn.close()
 

@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, jsonify, current_app, request
 import torch
 import torchaudio
-from db.audios_db import save_audio, get_audios, delete_audio_db
+from db.audios_db import save_audio_db, get_audios, delete_audio_db
 from model_loader import load_model
 from utils import get_unique_output_path, delete_file_folder
 from config import Config
@@ -34,10 +34,10 @@ def generate():
                 temperature=0.7,  # Adicione parâmetros personalizados aqui
             )
             
-            output_path = get_unique_output_path(voice)
+            base_name, output_path = get_unique_output_path(voice, "audio")
             torchaudio.save(output_path, torch.tensor(out["wav"]).unsqueeze(0), 24000)
     
-            save_audio(voice, speech, os.path.basename(output_path), output_path)
+            save_audio_db(base_name, speech, output_path, "permanent", voice)
             print(f"Saved audio at: {output_path}")
             
     return jsonify({'message': 'Audio saved successfully'}), 201
@@ -47,7 +47,7 @@ def generate():
 @audios_controller.route('/audio_files', methods=['GET'])
 def get_audio_files():
     audio_files = get_audios()
-    audio_list = [{'id': row[0], 'voice_name': row[1], 'audio_text': row[2], 'audio_name': row[3], 'audio_path': row[4]} for row in audio_files]
+    audio_list = [{'id': row[0], 'audio_name': row[1], 'audio_text': row[2], 'audio_path': row[3], 'audio_type': row[4], 'voice_name': row[5]} for row in audio_files]
     return jsonify(audio_list), 200
 
 

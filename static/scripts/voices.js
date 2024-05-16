@@ -1,3 +1,4 @@
+import { getVoices } from "./script.js";
 
 /*
 export async function listVoices(e) {
@@ -43,12 +44,26 @@ export async function listVoices(e) {
 const newVoicesContainer = document.getElementById('new-voices-container');
 
 
-function teste(e) {
+async function createTemporaryVoice(e) {
     e.preventDefault();
     const files = e.dataTransfer.files;
-    console.log(files)
 
-    Array.from(files).forEach(x => {
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('file', files[i]);
+    }
+
+    const response = await fetch('/voices_files', {
+        method: "POST",
+        body: formData
+    })
+
+    if (response.ok) {
+        const data = await getVoices();
+        console.log(data)
+    }
+        
+    /*Array.from(files).forEach(x => {
         const voiceContainer = document.createElement("div");
         voiceContainer.classList.add("voice-container");
 
@@ -66,12 +81,7 @@ function teste(e) {
 
         voiceContainer.appendChild(wrapperInputAndName);
         newVoicesContainer.appendChild(voiceContainer);
-    });
-
-    /*
-    const fileURL = URL.createObjectURL(file);
-    audioPlayer.src = fileURL;
-    */
+    });*/
 }
 
 function handleDragOver(event) {
@@ -79,10 +89,11 @@ function handleDragOver(event) {
 }
 
 const dropArea = document.getElementById('dropArea');
-dropArea.addEventListener('drop', (e) => teste(e));
+dropArea.addEventListener('drop', (e) => createTemporaryVoice(e));
 dropArea.addEventListener('dragover', handleDragOver);
 
-
+const data = await getVoices();
+console.log(data)
 
 /*
 let audiosData = await getAudioFiles("static/output/audios");

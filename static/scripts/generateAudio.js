@@ -7,6 +7,7 @@ const filterText = document.getElementById('filter_text');
 
 const audiosData = await getAudios();
 export let filterAudiosData = audiosData;
+console.log(audiosData)
 
 async function generateSpeech(voices) {
     var voices = document.getElementById("voices").value;
@@ -27,7 +28,7 @@ async function generateSpeech(voices) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ voices: [voices], text: text, number: number}),
+            body: JSON.stringify({ voices: [voices], text: text, number: number }),
         })
     } 
     catch 
@@ -37,6 +38,7 @@ async function generateSpeech(voices) {
 }
 
 export async function deleteAudio(id, audio_path) {
+    console.log(id + " " + audio_path)
     const response = await fetch("/audio_files", {
         method: "DELETE",
         headers: {
@@ -44,8 +46,6 @@ export async function deleteAudio(id, audio_path) {
         },
         body: JSON.stringify({id: id, audio_path: audio_path})
     });
-
-    await GetAudiosAndShow();
 }
 
 function filter(e, type) {
@@ -73,7 +73,7 @@ function filter(e, type) {
 
     filterAudiosData.filter(x => !x.voice_name.includes("temporary"));
 
-    showAudiosFiles(filterAudiosData);
+    showAudiosFiles(filterAudiosData, deleteAudio);
 }
 
 async function ListAudios() {
@@ -124,10 +124,10 @@ await ListVoicesFilter();
 await ListTextsFilter();
 
 
-//showAudiosFiles(filterAudiosData);
+showAudiosFiles(filterAudiosData, deleteAudio);
 
 
 filterVoice.addEventListener("change", (e) => filter(e, "voice_name"));
 filterText.addEventListener("change", (e) => filter(e, "audio_text"));
-generateBtn.addEventListener("click", async () => await generateAndGetAudiosFiles());
+generateBtn.addEventListener("click", async () => await generateSpeech());
 //deleteAllAudiosBtn.addEventListener('click', () => deleteAllAudioFiles('E:\\TTS\\static\\output\\audios\\', [['temporary', "not"]]))

@@ -2,17 +2,17 @@ import sqlite3
 from flask import current_app
 from config import Config
 
-def save_voice(name, emotion):
+def save_voice(voice_name, voice_path, voice_emotion, voice_type, voice_complement):
     conn = sqlite3.connect(Config.DATABASE)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO voices (name, emotion)
-        VALUES (?, ?)
-    ''', (name, emotion))
+        INSERT INTO voices (voice_name, voice_path, voice_emotion, voice_type, voice_complement)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (voice_name, voice_path, voice_emotion, voice_type, voice_complement))
     conn.commit()
     conn.close()
 
-def list_voices():
+def get_voices_db():
     conn = sqlite3.connect(Config.DATABASE)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM voices')
