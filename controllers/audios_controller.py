@@ -16,13 +16,15 @@ audios_controller = Blueprint('audios_controller', __name__)
 def generate():
 
     data = request.json
-    voices = data['voices']
+    voices = data['voicesList']
     speech = data['text']
     number = int(data['number'])
+    type = data['type']
+    print(voices)
 
     for voice in voices:
         print("Computing speaker latents...")
-        gpt_cond_latent, speaker_embedding = model.get_conditioning_latents(audio_path=[f"static/output/voices/{voice}.wav"])
+        gpt_cond_latent, speaker_embedding = model.get_conditioning_latents(audio_path=[f"static/output/voices/{voice['name']}.wav"])
 
         print("Inference...")
         for i in range(number):
@@ -34,10 +36,11 @@ def generate():
                 temperature=0.7,  # Adicione parâmetros personalizados aqui
             )
             
-            base_name, output_path = get_unique_output_path(voice, "audio")
+            audio_name = voice['name'].split('_voice_')[0]
+            base_name, output_path = get_unique_output_path("static/output/audios", audio_name)
             torchaudio.save(output_path, torch.tensor(out["wav"]).unsqueeze(0), 24000)
     
-            save_audio_db(base_name, speech, output_path, "permanent", voice)
+            save_audio_db(base_name, speech, output_path, type, voice['id'], voice['name'])
             print(f"Saved audio at: {output_path}")
             
     return jsonify({'message': 'Audio saved successfully'}), 201
@@ -47,7 +50,7 @@ def generate():
 @audios_controller.route('/audio_files', methods=['GET'])
 def get_audio_files():
     audio_files = get_audios()
-    audio_list = [{'id': row[0], 'audio_name': row[1], 'audio_text': row[2], 'audio_path': row[3], 'audio_type': row[4], 'voice_name': row[5]} for row in audio_files]
+    audio_list = [{'id': row[0], 'audio_name': row[1], 'audio_text': row[2], 'audio_path': row[3], 'audio_type': row[4], 'voice_id': row[5], 'voice_name': row[6]} for row in audio_files]
     return jsonify(audio_list), 200
 
 

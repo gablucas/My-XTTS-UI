@@ -14,10 +14,10 @@ def add_voice():
     files = request.files.getlist('file')
 
     for file in files:
-
-        base_name, output_path = get_unique_output_path("static/output/voices", file_name_without_extension, "voice")
+        audio_name = file.filename.split('.wav')[0]
+        output_path = os.path.join("static/output/voices", file.filename)
         file.save(output_path)
-        save_voice(base_name, output_path, "normal", "temporary", 0)
+        save_voice(audio_name, output_path, "normal", "temporary", 0)
     
     return jsonify({'message': 'Voice added successfully'}), 201
 

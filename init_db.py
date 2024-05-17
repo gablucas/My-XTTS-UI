@@ -12,6 +12,7 @@ def init_db():
             audio_text TEXT NOT NULL,
             audio_path TEXT NOT NULL,
             audio_type TEXT NOT NULL,
+            voice_id INTEGER NOT NULL,
             voice_name TEXT NOT NULL
         )
     ''')

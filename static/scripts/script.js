@@ -1,6 +1,5 @@
 
-
-export function generateElement(element, classes, id, innerHTML, eventListener) {
+export function generateElement(element, classes, id, innerHTML) {
     const newElement = document.createElement(element);
 
     if (classes !== null ) {
@@ -52,7 +51,7 @@ export async function getAudioFiles(directory) {
     }
 }
 
-export function showAudiosFiles(audiosData, deleteFunction) {
+export function showAudiosFiles(audiosData, deleteFunction, toggleAudio) {
     const generatedAudioList = document.getElementById('audio-list-generated');
     const enhancedAudioList = document.getElementById('audio-list-enhanced');
 
@@ -62,7 +61,6 @@ export function showAudiosFiles(audiosData, deleteFunction) {
     audiosData.forEach(audioData => {
         const name = audioData['audio_name'].split(".wav")[0];
         const path = audioData['audio_path'];
-        console.log(audioData)
 
         const audioContainer = generateElement('div', [name, 'audio-container'], null, null, null);
         const audioActionsContainer = generateElement('div', ['audio-actions'], null, null, null);
@@ -120,4 +118,29 @@ export async function getVoices() {
     const response = await fetch("/voices_files", { method: 'GET' })
     const data = await response.json();
     return data;
+}
+
+export async function generateSpeech(voicesList, text, number, type) {
+
+    if (text === undefined || text === "") {
+        text = "I'm doing a test to see how my voice sounds in this inference, well. It seems good?"
+    }
+
+    if (number === undefined || number === 0) {
+        number = "1";
+    }
+
+    try {
+        const response = await fetch(`/audio_files`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ voicesList: voicesList, text: text, number: number, type: type }),
+        })
+    } 
+    catch 
+    {
+        console.log('Erro ao obter arquivos de áudio:');
+    }
 }

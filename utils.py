@@ -1,11 +1,11 @@
 #GERAR CAMINHO DE SAIDA
 import os
 
-def get_unique_output_path(voice, suffix):
-    base_name = f"{voice}_{suffix}"
+def get_unique_output_path(path, voice):
+    base_name = f"{voice}"
     counter = 1
     while True:
-        output_path = os.path.join("static/output/audios", f"{base_name}_{counter}.wav")
+        output_path = os.path.join(path, f"{base_name}_{counter}.wav")
         if not os.path.exists(output_path):
             break
         counter += 1

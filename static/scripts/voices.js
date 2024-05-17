@@ -1,48 +1,109 @@
-import { getVoices } from "./script.js";
+import { generateElement, getVoices, getAudios, generateSpeech, toggleAudio } from "./script.js";
 
-/*
-export async function listVoices(e) {
-
-    const files = e.dataTransfer.files;
-    const form = new FormData();
-    console.log(files)
-
-    for (let i = 0; i < files.length; i++) {
-        const arquivo = files[i];
-        const novoNome = arquivo.name.replace(".wav", "_temporary.wav");
-        const novoArquivo = new File([arquivo], novoNome, { type: arquivo.type });
-        form.append('file', novoArquivo);
-    }
-
-    try {
-        const response = await fetch('/upload-voices', {
-            method: 'POST',
-            body: form,
-        })
-
-        if (response.status === 200) {
-            console.log('Arquivos enviados com sucesso:', data);
-        }
-    }
-    catch 
-    {
-        console.log('Erro ao enviar arquivos:')
-    }
-
-    let voicesData = await getAudioFiles('static/output/voices/');
-    voicesData = voicesData.filter(x => x.file_name.includes("temporary")).map((x) => x.file_name.split(".wav")[0]);
-
-    await generateSpeech(voicesData);
-
-    let audiosData = await getAudioFiles("static/output/audios");
-    audiosData = audiosData.filter(x => x.file_name.includes("temporary"));
-    showAudiosFiles(audiosData);
-}
-*/
-//const audioPlayer = document.getElementById('audioPlayer');
-
+const dropArea = document.getElementById('dropArea');
+const generateBtn = document.getElementById("generateAudio");
 const newVoicesContainer = document.getElementById('new-voices-container');
 
+const voicesData = await getVoices();
+const audiosData = await getAudios();
+
+function showVoices() {
+    voicesData.forEach(x => {
+        const voiceContainer = generateElement('div', [`${x.voice_name}_voice_${x.id}`, "temporary_voice","primary-container", "vertical-elements"], null, null);
+        const voiceName = generateElement('span', null, null, x.voice_name);
+        const emotionSelect = generateElement('select', null, null, null);
+        const audioFileContainer = generateElement('div', null, `audio_cotainer_voice_${x.id}`, null);
+
+        const emotions = [
+            "Normal",
+            "Happy",
+            "Sad",
+            "Angry",
+            "Astonished",
+            "Scared",
+            "Tired out",
+            "Cheered up",
+            "Irritated",
+            "Embarrassed",
+            "Anxious",
+            "Excited",
+            "Calm",
+            "Melancholic",
+            "Disappointed",
+            "Confused",
+            "Carefree",
+            "Loving"
+        ];
+
+        
+        emotions.forEach(e => {
+            
+            const emotionOption = generateElement('option', null, null, e);
+            emotionOption.setAttribute('value', e);
+            emotionSelect.appendChild(emotionOption);
+        });
+
+        voiceContainer.appendChild(voiceName);
+        voiceContainer.appendChild(emotionSelect);
+        voiceContainer.appendChild(audioFileContainer);
+    
+        newVoicesContainer.appendChild(voiceContainer);
+    })
+}
+console.log(audiosData)
+export function showAudiosFiles(audiosData, deleteFunction) {
+    audiosData.forEach(audioData => {
+
+        const voiceContainer = document.querySelectorAll(`.${audioData.voice_name}_voice_${audioData.voiceId}`);
+        
+        voiceContainer.forEach((container) => {
+            console.log(container)
+            const name = audioData.audio_name;
+            const path = audioData.audio_path;
+    
+            const audioContainer = generateElement('div', [name, 'audio-container'], null, null, null);
+            const audioActionsContainer = generateElement('div', ['audio-actions'], null, null, null);
+            const audioName = generateElement('span', null, null, name, null);
+            const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, "play_arrow")
+            const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, "pause");
+            //const audioDelete = generateElement('span', ["audio-button-delete", "material-symbols-outlined"], null, "delete");
+    
+            const audio = new Audio(path);
+            audio.controls = true
+    
+            audioPlay.addEventListener('click', (e) => toggleAudio(audio, name, "play"))
+            audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"))
+            //audioDelete.addEventListener('click', () => deleteFunction(audioData.id, audioData.audio_path))
+            
+            audioActionsContainer.appendChild(audioPlay);
+            audioActionsContainer.appendChild(audioPause);
+            //audioActionsContainer.append(audioDelete);
+            audioContainer.appendChild(audioName);
+            audioContainer.appendChild(audioActionsContainer);
+    
+            container.appendChild(audioContainer);
+        })
+    });
+}
+
+async function generateSpeechCallback() {
+    var voices = document.querySelectorAll(".temporary_voice")
+    var text = document.getElementById("text")?.value;
+    //var number = document.getElementById("number")?.value;
+
+    const voicesList = [];
+
+    // VER COMO FAZER ESSE LANCE DE PEGAR PELA CLASSE
+    voices.forEach(voice => {
+        
+        let [voiceName, voiceId] = voice.getAttribute("id").split('_voice_');
+        voicesList.push({id: voiceId, name: voiceName });
+    });
+
+    console.log(voicesList)
+
+    await generateSpeech(voicesList, text, 1, "temporary");
+}
 
 async function createTemporaryVoice(e) {
     e.preventDefault();
@@ -88,18 +149,9 @@ function handleDragOver(event) {
     event.preventDefault();
 }
 
-const dropArea = document.getElementById('dropArea');
+showVoices();
+showAudiosFiles(audiosData)
+
 dropArea.addEventListener('drop', (e) => createTemporaryVoice(e));
 dropArea.addEventListener('dragover', handleDragOver);
-
-const data = await getVoices();
-console.log(data)
-
-/*
-let audiosData = await getAudioFiles("static/output/audios");
-audiosData = audiosData.filter(x => x.file_name.includes("temporary"));
-showAudiosFiles(audiosData);
-
-const deleteAllAudiosBtn = document.getElementById("deleteAllAudios");
-//deleteAllAudiosBtn.addEventListener('click', () => deleteAllAudioFiles('E:\\TTS\\static\\output\\audios\\', [['temporary', ""]]))
-*/
+generateBtn.addEventListener("click", async () => generateSpeechCallback());
