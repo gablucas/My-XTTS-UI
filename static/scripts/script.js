@@ -1,5 +1,5 @@
 
-export function generateElement(element, classes, id, innerHTML) {
+export function generateElement(element, classes, id, data, innerHTML) {
     const newElement = document.createElement(element);
 
     if (classes !== null ) {
@@ -8,6 +8,10 @@ export function generateElement(element, classes, id, innerHTML) {
 
     if (id !== null) {
         newElement.setAttribute("id", id);
+    }
+
+    if (data !== null) {
+        newElement.setAttribute(data.name, data.value);
     }
 
     if (innerHTML !== null) {

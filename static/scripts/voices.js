@@ -9,10 +9,11 @@ const audiosData = await getAudios();
 
 function showVoices() {
     voicesData.forEach(x => {
-        const voiceContainer = generateElement('div', [`${x.voice_name}_voice_${x.id}`, "temporary_voice","primary-container", "vertical-elements"], null, null);
-        const voiceName = generateElement('span', null, null, x.voice_name);
-        const emotionSelect = generateElement('select', null, null, null);
-        const audioFileContainer = generateElement('div', null, `audio_cotainer_voice_${x.id}`, null);
+
+        const voiceContainer = generateElement('div', ["temporary_voice", "primary-container", "vertical-elements"], null, {name: "data-voice", value: `${x.voice_name}_voice_${x.id}`}, null);
+        const voiceName = generateElement('span', null, null, null, x.voice_name);
+        const emotionSelect = generateElement('select', null, null, null, null);
+        const audioFileContainer = generateElement('div', null, `audio_cotainer_voice_${x.id}`, null, null);
 
         const emotions = [
             "Normal",
@@ -38,7 +39,7 @@ function showVoices() {
         
         emotions.forEach(e => {
             
-            const emotionOption = generateElement('option', null, null, e);
+            const emotionOption = generateElement('option', null, null, null, e);
             emotionOption.setAttribute('value', e);
             emotionSelect.appendChild(emotionOption);
         });
@@ -50,22 +51,24 @@ function showVoices() {
         newVoicesContainer.appendChild(voiceContainer);
     })
 }
-console.log(audiosData)
 export function showAudiosFiles(audiosData, deleteFunction) {
-    audiosData.forEach(audioData => {
+    const voiceContainer = document.querySelectorAll(".temporary_voice");
+    
+    voiceContainer.forEach((container) => {
+        const voiceId = container.getAttribute('data-voice').split("_voice_")[1];
 
-        const voiceContainer = document.querySelectorAll(`.${audioData.voice_name}_voice_${audioData.voiceId}`);
-        
-        voiceContainer.forEach((container) => {
-            console.log(container)
+        const voiceAudios = audiosData.filter(x => x.voice_id === parseInt(voiceId));
+        console.log(voiceAudios)
+
+        voiceAudios.forEach(audioData => {
             const name = audioData.audio_name;
             const path = audioData.audio_path;
     
-            const audioContainer = generateElement('div', [name, 'audio-container'], null, null, null);
-            const audioActionsContainer = generateElement('div', ['audio-actions'], null, null, null);
-            const audioName = generateElement('span', null, null, name, null);
-            const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, "play_arrow")
-            const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, "pause");
+            const audioContainer = generateElement('div', [name, 'audio-container'], null, null, null, null);
+            const audioActionsContainer = generateElement('div', ['audio-actions'], null, null, null, null);
+            const audioName = generateElement('span', null, null, null, name, null);
+            const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, null, "play_arrow")
+            const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, null, "pause");
             //const audioDelete = generateElement('span', ["audio-button-delete", "material-symbols-outlined"], null, "delete");
     
             const audio = new Audio(path);
@@ -96,7 +99,7 @@ async function generateSpeechCallback() {
     // VER COMO FAZER ESSE LANCE DE PEGAR PELA CLASSE
     voices.forEach(voice => {
         
-        let [voiceName, voiceId] = voice.getAttribute("id").split('_voice_');
+        let [voiceName, voiceId] = voice.getAttribute("data-voice").split('_voice_');
         voicesList.push({id: voiceId, name: voiceName });
     });
 

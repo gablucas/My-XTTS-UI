@@ -2,10 +2,11 @@
 import os
 
 def get_unique_output_path(path, voice):
-    base_name = f"{voice}"
     counter = 1
+    base_name = f"{voice}_{counter}"
     while True:
-        output_path = os.path.join(path, f"{base_name}_{counter}.wav")
+        base_name = f"{voice}_{counter}"
+        output_path = os.path.join(path, f"{base_name}.wav")
         if not os.path.exists(output_path):
             break
         counter += 1
