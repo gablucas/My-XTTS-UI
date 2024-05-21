@@ -68,10 +68,10 @@ export function showAudiosFiles(audiosData, deleteFunction, toggleAudio) {
 
         const audioContainer = generateElement('div', [name, 'audio-container'], null, null, null);
         const audioActionsContainer = generateElement('div', ['audio-actions'], null, null, null);
-        const audioName = generateElement('span', null, null, name, null);
-        const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, "play_arrow")
-        const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, "pause");
-        const audioDelete = generateElement('span', ["audio-button-delete", "material-symbols-outlined"], null, "delete");
+        const audioName = generateElement('span', null, null, null, name);
+        const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, null, "play_arrow")
+        const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, null, "pause");
+        const audioDelete = generateElement('span', ["audio-button-delete", "material-symbols-outlined"], null, null, "delete");
 
         const audio = new Audio(path);
         audio.controls = true

@@ -58,14 +58,12 @@ def get_audio_files():
 @audios_controller.route('/audio_files', methods=['DELETE'])
 def delete_audio():
     data = request.json
-    audio_id = data.get('id')
-    audio_path = data.get('audio_path')
 
-    if not audio_id:
+    if not data['id']:
         return jsonify({'error': 'File name is required'}), 400
 
-    file_success, file_message = delete_file_folder(audio_path)
-    db_success, db_message = delete_audio_db(audio_id)
+    db_success, db_message = delete_audio_db(data['id'])
+    file_success, file_message = delete_file_folder(data['path'])
 
     if file_success and db_success:
         return jsonify({'message': f"{file_message}. {db_message}"}), 200

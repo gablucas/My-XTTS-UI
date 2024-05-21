@@ -5,8 +5,9 @@ const voicesSelect = document.getElementById('voices');
 const filterVoice = document.getElementById('filter_voice');
 const filterText = document.getElementById('filter_text');
 
-const audiosData = await getAudios();
-const voicesData = await getVoices();
+const voicesData = (await getVoices()).filter(x => x.voice_type === "permanent");
+const audiosData = (await getAudios()).filter(x => x.audio_type === "permanent");
+console.log(voicesData)
 
 export let filterAudiosData = audiosData;
 
@@ -78,7 +79,7 @@ async function ListGenerateVoices() {
 
 async function ListVoicesFilter() {
     filterVoice.innerHTML = "<option value='all'>All</option>";
-    const uniqueVoicesName = Array.from(new Set(audiosData.map(x => x.voice_name)));
+    const uniqueVoicesName = Array.from(new Set(voicesData.map(x => x.voice_name)));
 
     uniqueVoicesName.forEach(data => {
         const filterVoiceOption = document.createElement('option');

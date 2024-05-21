@@ -4,43 +4,25 @@ const dropArea = document.getElementById('dropArea');
 const generateBtn = document.getElementById("generateAudio");
 const newVoicesContainer = document.getElementById('new-voices-container');
 
-const voicesData = await getVoices();
-const audiosData = await getAudios();
+const voicesData = (await getVoices()).filter(x => x.voice_type === "temporary");
+const audiosData = (await getAudios()).filter(x => x.audio_type === "temporary");
+console.log(voicesData)
 
 function showVoices() {
     voicesData.forEach(x => {
 
         const voiceContainer = generateElement('div', ["temporary_voice", "primary-container", "vertical-elements"], null, {name: "data-voice", value: `${x.voice_name}_voice_${x.id}`}, null);
         const voiceName = generateElement('span', null, null, null, x.voice_name);
-        const emotionSelect = generateElement('select', null, null, null, null);
+        const emotionSelect = generateElement('select', null, `select-voice-${x.id}`, null, null);
         const audioFileContainer = generateElement('div', null, `audio_cotainer_voice_${x.id}`, null, null);
 
-        const emotions = [
-            "Normal",
-            "Happy",
-            "Sad",
-            "Angry",
-            "Astonished",
-            "Scared",
-            "Tired out",
-            "Cheered up",
-            "Irritated",
-            "Embarrassed",
-            "Anxious",
-            "Excited",
-            "Calm",
-            "Melancholic",
-            "Disappointed",
-            "Confused",
-            "Carefree",
-            "Loving"
-        ];
+        const emotionOption = generateElement('option', null, null, null, "None");
+        emotionOption.setAttribute('value', 0);
+        emotionSelect.appendChild(emotionOption);
 
-        
-        emotions.forEach(e => {
-            
-            const emotionOption = generateElement('option', null, null, null, e);
-            emotionOption.setAttribute('value', e);
+        voicesData.forEach(e => {
+            const emotionOption = generateElement('option', null, null, null, e.voice_name);
+            emotionOption.setAttribute('value', e.id);
             emotionSelect.appendChild(emotionOption);
         });
 
@@ -51,16 +33,59 @@ function showVoices() {
         newVoicesContainer.appendChild(voiceContainer);
     })
 }
+
+async function deleteVoiceAndAudio(voice, audio) {
+    const audioResponse = await fetch('/audio_files', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(audio)
+    })
+
+    const voiceResponse = await fetch('/voices_files', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(voice)
+    })
+
+    await Promise.all([audioResponse, voiceResponse]);
+}
+
+async function updateVoiceAndAudio(voice, audio) {
+    const audioResponse = await fetch('/audio_files', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(audio)
+    })
+
+    const voiceComplement = document.getElementById(`select-voice-${voice.id}`).value;
+
+    const voiceResponse = await fetch('/voices_files', {
+        method: 'PUT',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify({ id: voice.id, type: 'permanent', complement: voiceComplement })
+    })
+
+    await Promise.all([audioResponse, voiceResponse]);
+}
+
 export function showAudiosFiles(audiosData, deleteFunction) {
     const voiceContainer = document.querySelectorAll(".temporary_voice");
     
     voiceContainer.forEach((container) => {
         const voiceId = container.getAttribute('data-voice').split("_voice_")[1];
+        const voice = voicesData.find(x => x.id === parseInt(voiceId));
 
-        const voiceAudios = audiosData.filter(x => x.voice_id === parseInt(voiceId));
-        console.log(voiceAudios)
+        const audios = audiosData.filter(x => x.voice_id === parseInt(voiceId));
 
-        voiceAudios.forEach(audioData => {
+        audios.forEach(audioData => {
             const name = audioData.audio_name;
             const path = audioData.audio_path;
     
@@ -70,21 +95,32 @@ export function showAudiosFiles(audiosData, deleteFunction) {
             const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, null, "play_arrow")
             const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, null, "pause");
             //const audioDelete = generateElement('span', ["audio-button-delete", "material-symbols-outlined"], null, "delete");
+            
+            const voiceSaveOrDeleteContainer =  generateElement('div', ['horizontal-elements'], null, null, null);
+            const voiceSave = generateElement('button', ['grow'], 'voice-save', null, "Salvar");
+            const voiceDelete = generateElement('button', ['grow'], 'voice-save', null, "Deletar");
     
             const audio = new Audio(path);
             audio.controls = true
     
             audioPlay.addEventListener('click', (e) => toggleAudio(audio, name, "play"))
             audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"))
-            //audioDelete.addEventListener('click', () => deleteFunction(audioData.id, audioData.audio_path))
+
+            // PAREI AQUI
+            voiceSave.addEventListener('click', () => updateVoiceAndAudio({id: voice.id}, {id: audioData.id, path: audioData.audio_path}));
+            voiceDelete.addEventListener('click', () => deleteVoiceAndAudio({id: voice.id, path: voice.voice_path}, {id: audioData.id, path: audioData.audio_path}));
+
+            voiceSaveOrDeleteContainer.appendChild(voiceSave);
+            voiceSaveOrDeleteContainer.appendChild(voiceDelete);
             
             audioActionsContainer.appendChild(audioPlay);
             audioActionsContainer.appendChild(audioPause);
             //audioActionsContainer.append(audioDelete);
             audioContainer.appendChild(audioName);
             audioContainer.appendChild(audioActionsContainer);
-    
+            
             container.appendChild(audioContainer);
+            container.appendChild(voiceSaveOrDeleteContainer);
         })
     });
 }

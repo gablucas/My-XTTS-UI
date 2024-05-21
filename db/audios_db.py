@@ -22,12 +22,14 @@ def get_audios():
     return audio_files
 
 def delete_audio_db(id):
+    conn = sqlite3.connect(Config.DATABASE)
     try:
-        conn = sqlite3.connect(Config.DATABASE)
         cursor = conn.cursor()
         cursor.execute('DELETE FROM audio_files WHERE id = ?', (id,))
         conn.commit()
         conn.close()
-        return True, "Database entry deleted successfully."
-    except Exception as e:
-        return False, f"Error occurred while deleting database entry: {e}"
+        return (True, "Audio deleted successfully")
+    except sqlite3.Error as e:
+        conn.rollback()
+        conn.close()
+        return (False, f"Error deleting voice: {e}")

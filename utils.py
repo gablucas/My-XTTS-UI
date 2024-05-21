@@ -1,5 +1,6 @@
 #GERAR CAMINHO DE SAIDA
 import os
+import re
 
 def get_unique_output_path(path, voice):
     counter = 1
@@ -21,3 +22,12 @@ def delete_file_folder(file_path):
         return False, f"File {file_path} not found."
     except Exception as e:
         return False, f"Error occurred while deleting file {file_path}: {e}"
+    
+#EXTRAIR EMOCAO DO AUDIO
+def extract_emotion(filename):
+    pattern = r".*_(\w+)\.wav"
+    match = re.search(pattern, filename)
+    if match:
+        return match.group(1)
+    else:
+        return None

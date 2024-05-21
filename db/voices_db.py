@@ -20,7 +20,7 @@ def get_voices_db():
     conn.close()
     return voices
 
-def get_voice(voice_id):
+def get_voice_byid_db(voice_id):
     conn = sqlite3.connect(Config.DATABASE)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM voices WHERE id = ?', (voice_id,))
@@ -28,20 +28,26 @@ def get_voice(voice_id):
     conn.close()
     return voice
 
-def update_voice(voice_id, name, description=''):
+def update_voice_db(voice_type, voice_complement, id):
     conn = sqlite3.connect(Config.DATABASE)
     cursor = conn.cursor()
     cursor.execute('''
         UPDATE voices
-        SET name = ?, description = ?
+        SET voice_type = ?, voice_complement = ?
         WHERE id = ?
-    ''', (name, description, voice_id))
+    ''', (voice_type, voice_complement, id))
     conn.commit()
     conn.close()
 
-def delete_voice(voice_id):
+def delete_voice_db(id):
     conn = sqlite3.connect(Config.DATABASE)
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM voices WHERE id = ?', (voice_id,))
-    conn.commit()
-    conn.close()
+    try:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM voices WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        return (True, "Voice deleted successfully")
+    except sqlite3.Error as e:
+        conn.rollback()
+        conn.close()
+        return (False, f"Error deleting voice: {e}")

@@ -27,6 +27,13 @@ button {
     border-radius: 7px;
     color: #ECF462;
     background-color: #363636;
+    cursor: pointer;
+
+    transition: all .3s;
+}
+
+button:hover {
+    box-shadow: 0px 0px 0px 1px #ECF462;
 }
 
 audio {
@@ -114,6 +121,15 @@ header a {
     display: flex;
     flex-direction: column;
     gap: 12px
+}
+
+.horizontal-elements {
+    display: flex;
+    gap: 12px
+}
+
+.grow {
+    flex-grow: 1;
 }
 
 .input-container {
