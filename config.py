@@ -1,4 +1,4 @@
 class Config:
-    DEBUG = True
-    RUN_MODEL = False
+    DEBUG = False
+    RUN_MODEL = True
     DATABASE = "XTTS.db"

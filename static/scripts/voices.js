@@ -4,11 +4,55 @@ const dropArea = document.getElementById('dropArea');
 const generateBtn = document.getElementById("generateAudio");
 const newVoicesContainer = document.getElementById('new-voices-container');
 
-const voicesData = (await getVoices()).filter(x => x.voice_type === "temporary");
-const audiosData = (await getAudios()).filter(x => x.audio_type === "temporary");
-console.log(voicesData)
+async function deleteVoiceAndAudio(e, voice, audio) {
+    const audioResponse = await fetch('/audio_files', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(audio)
+    })
 
-function showVoices() {
+    const voiceResponse = await fetch('/voices_files', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(voice)
+    })
+
+    await Promise.all([audioResponse, voiceResponse]);
+
+    e.target.parentElement.parentElement.remove();
+}
+
+async function updateVoiceAndAudio(e, voice, audio) {
+    const audioResponse = await fetch('/audio_files', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(audio)
+    })
+
+    const voiceComplement = document.getElementById(`select-voice-${voice.id}`).value;
+
+    const voiceResponse = await fetch('/voices_files', {
+        method: 'PUT',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify({ id: voice.id, type: 'permanent', complement: voiceComplement })
+    })
+
+    await Promise.all([audioResponse, voiceResponse]);
+
+    e.target.parentElement.parentElement.remove();
+}
+
+async function showVoices() {
+    const voicesData = (await getVoices()).filter(x => x.voice_type === "temporary");
+
     voicesData.forEach(x => {
 
         const voiceContainer = generateElement('div', ["temporary_voice", "primary-container", "vertical-elements"], null, {name: "data-voice", value: `${x.voice_name}_voice_${x.id}`}, null);
@@ -34,49 +78,10 @@ function showVoices() {
     })
 }
 
-async function deleteVoiceAndAudio(voice, audio) {
-    const audioResponse = await fetch('/audio_files', {
-        method: 'DELETE',
-        headers: {
-            'Content-Type' : 'application/json'
-        },
-        body: JSON.stringify(audio)
-    })
+export async function showAudiosFiles() {
+    const audiosData = (await getAudios()).filter(x => x.audio_type === "temporary");
+    const voicesData = (await getVoices()).filter(x => x.voice_type === "temporary");
 
-    const voiceResponse = await fetch('/voices_files', {
-        method: 'DELETE',
-        headers: {
-            'Content-Type' : 'application/json'
-        },
-        body: JSON.stringify(voice)
-    })
-
-    await Promise.all([audioResponse, voiceResponse]);
-}
-
-async function updateVoiceAndAudio(voice, audio) {
-    const audioResponse = await fetch('/audio_files', {
-        method: 'DELETE',
-        headers: {
-            'Content-Type' : 'application/json'
-        },
-        body: JSON.stringify(audio)
-    })
-
-    const voiceComplement = document.getElementById(`select-voice-${voice.id}`).value;
-
-    const voiceResponse = await fetch('/voices_files', {
-        method: 'PUT',
-        headers: {
-            'Content-Type' : 'application/json'
-        },
-        body: JSON.stringify({ id: voice.id, type: 'permanent', complement: voiceComplement })
-    })
-
-    await Promise.all([audioResponse, voiceResponse]);
-}
-
-export function showAudiosFiles(audiosData, deleteFunction) {
     const voiceContainer = document.querySelectorAll(".temporary_voice");
     
     voiceContainer.forEach((container) => {
@@ -94,7 +99,6 @@ export function showAudiosFiles(audiosData, deleteFunction) {
             const audioName = generateElement('span', null, null, null, name, null);
             const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, null, "play_arrow")
             const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, null, "pause");
-            //const audioDelete = generateElement('span', ["audio-button-delete", "material-symbols-outlined"], null, "delete");
             
             const voiceSaveOrDeleteContainer =  generateElement('div', ['horizontal-elements'], null, null, null);
             const voiceSave = generateElement('button', ['grow'], 'voice-save', null, "Salvar");
@@ -107,8 +111,8 @@ export function showAudiosFiles(audiosData, deleteFunction) {
             audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"))
 
             // PAREI AQUI
-            voiceSave.addEventListener('click', () => updateVoiceAndAudio({id: voice.id}, {id: audioData.id, path: audioData.audio_path}));
-            voiceDelete.addEventListener('click', () => deleteVoiceAndAudio({id: voice.id, path: voice.voice_path}, {id: audioData.id, path: audioData.audio_path}));
+            voiceSave.addEventListener('click', (e) => updateVoiceAndAudio(e, {id: voice.id}, {id: audioData.id, path: audioData.audio_path}));
+            voiceDelete.addEventListener('click', (e) => deleteVoiceAndAudio(e, {id: voice.id, path: voice.voice_path}, {id: audioData.id, path: audioData.audio_path}));
 
             voiceSaveOrDeleteContainer.appendChild(voiceSave);
             voiceSaveOrDeleteContainer.appendChild(voiceDelete);
@@ -139,9 +143,9 @@ async function generateSpeechCallback() {
         voicesList.push({id: voiceId, name: voiceName });
     });
 
-    console.log(voicesList)
-
     await generateSpeech(voicesList, text, 1, "temporary");
+    const audiosData = (await getAudios()).filter(x => x.audio_type === "temporary");
+    showAudiosFiles(audiosData)
 }
 
 async function createTemporaryVoice(e) {
@@ -161,6 +165,10 @@ async function createTemporaryVoice(e) {
     if (response.ok) {
         const data = await getVoices();
         console.log(data)
+        const voicesData = (await getVoices()).filter(x => x.voice_type === "temporary");
+        const audiosData = (await getAudios()).filter(x => x.audio_type === "temporary");
+        showVoices(voicesData);
+        showAudiosFiles(audiosData)
     }
         
     /*Array.from(files).forEach(x => {
@@ -189,7 +197,7 @@ function handleDragOver(event) {
 }
 
 showVoices();
-showAudiosFiles(audiosData)
+showAudiosFiles()
 
 dropArea.addEventListener('drop', (e) => createTemporaryVoice(e));
 dropArea.addEventListener('dragover', handleDragOver);
