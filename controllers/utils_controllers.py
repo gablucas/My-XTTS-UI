@@ -7,7 +7,6 @@ import torchaudio
 from pedalboard.io import AudioFile
 from pedalboard import *
 import noisereduce as nr
-from db.audios_db import save_audio
 from utils import get_unique_output_path
 
 

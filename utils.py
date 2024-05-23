@@ -1,15 +1,17 @@
 #GERAR CAMINHO DE SAIDA
 import os
+import re
 
-def get_unique_output_path(voice):
-    base_name = f"{voice}_output"
+def get_unique_output_path(path, voice):
     counter = 1
+    base_name = f"{voice}_{counter}"
     while True:
-        output_path = os.path.join("static/output/audios", f"{base_name}_{counter}.wav")
+        base_name = f"{voice}_{counter}"
+        output_path = os.path.join(path, f"{base_name}.wav")
         if not os.path.exists(output_path):
             break
         counter += 1
-    return output_path
+    return base_name, output_path
 
 #EXCLUIR AUDIOS
 def delete_file_folder(file_path):
@@ -20,3 +22,12 @@ def delete_file_folder(file_path):
         return False, f"File {file_path} not found."
     except Exception as e:
         return False, f"Error occurred while deleting file {file_path}: {e}"
+    
+#EXTRAIR EMOCAO DO AUDIO
+def extract_emotion(filename):
+    pattern = r".*_(\w+)\.wav"
+    match = re.search(pattern, filename)
+    if match:
+        return match.group(1)
+    else:
+        return None

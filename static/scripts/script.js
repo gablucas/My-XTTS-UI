@@ -1,4 +1,25 @@
-import { deleteAudio } from "./generateAudio.js";
+
+export function generateElement(element, classes, id, data, innerHTML) {
+    const newElement = document.createElement(element);
+
+    if (classes !== null ) {
+        classes.forEach(x => newElement.classList.add(x));
+    }
+
+    if (id !== null) {
+        newElement.setAttribute("id", id);
+    }
+
+    if (data !== null) {
+        newElement.setAttribute(data.name, data.value);
+    }
+
+    if (innerHTML !== null) {
+        newElement.innerHTML = innerHTML;
+    }
+
+    return newElement;
+}
 
 export function toggleAudio(audio, className, action) {
     const audioBtnList = document.querySelectorAll(".audio-button-pause");
@@ -34,7 +55,7 @@ export async function getAudioFiles(directory) {
     }
 }
 
-export function showAudiosFiles(audiosData) {
+export function showAudiosFiles(audiosData, deleteFunction, toggleAudio) {
     const generatedAudioList = document.getElementById('audio-list-generated');
     const enhancedAudioList = document.getElementById('audio-list-enhanced');
 
@@ -45,34 +66,20 @@ export function showAudiosFiles(audiosData) {
         const name = audioData['audio_name'].split(".wav")[0];
         const path = audioData['audio_path'];
 
-        const audioContainer = document.createElement('div');
-        audioContainer.classList.add(name, "audio-container");
+        const audioContainer = generateElement('div', [name, 'audio-container'], null, null, null);
+        const audioActionsContainer = generateElement('div', ['audio-actions'], null, null, null);
+        const audioName = generateElement('span', null, null, null, name);
+        const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, null, "play_arrow")
+        const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, null, "pause");
+        const audioDelete = generateElement('span', ["audio-button-delete", "material-symbols-outlined"], null, null, "delete");
 
-        const audioActionsContainer = document.createElement('div');
-        audioActionsContainer.classList.add("audio-actions");
-
-        const audioName = document.createElement('span');
-        audioName.innerHTML = name;
-        
-        const audioPlay = document.createElement('span');
-        audioPlay.classList.add("audio-button-play", "material-symbols-outlined");
-        audioPlay.innerHTML = "play_arrow";
-        audioPlay.addEventListener('click', (e) => toggleAudio(audio, name, "play"))
-        
-        const audioPause = document.createElement('span');
-        audioPause.classList.add("audio-button-pause", "hide", "material-symbols-outlined");
-        audioPause.innerHTML = "pause";
-        audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"))
-
-        const audioDelete = document.createElement('span');
-        audioDelete.classList.add("audio-button-delete", "material-symbols-outlined");
-        audioDelete.innerHTML = "delete";
-        audioDelete.addEventListener('click', async () => await deleteAudio(audioData.id, audioData.audio_path))
-        
         const audio = new Audio(path);
-        audio.controls = true;
-        
+        audio.controls = true
 
+        audioPlay.addEventListener('click', (e) => toggleAudio(audio, name, "play"))
+        audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"))
+        audioDelete.addEventListener('click', () => deleteFunction(audioData.id, audioData.audio_path))
+        
         audioActionsContainer.appendChild(audioPlay);
         audioActionsContainer.appendChild(audioPause);
         audioActionsContainer.append(audioDelete);
@@ -107,6 +114,37 @@ export function deleteAllAudioFiles(deletePath, filtros) {
 
 export async function getAudios() {
     const response = await fetch("/audio_files")
-    const data =  await response.json();
+    const data = await response.json();
     return data;
+}
+
+export async function getVoices() {
+    const response = await fetch("/voices_files", { method: 'GET' })
+    const data = await response.json();
+    return data;
+}
+
+export async function generateSpeech(voicesList, text, number, type) {
+
+    if (text === undefined || text === "") {
+        text = "I'm doing a test to see how my voice sounds in this inference, well. It seems good?"
+    }
+
+    if (number === undefined || number === 0) {
+        number = "1";
+    }
+
+    try {
+        const response = await fetch(`/audio_files`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ voicesList: voicesList, text: text, number: number, type: type }),
+        })
+    } 
+    catch 
+    {
+        console.log('Erro ao obter arquivos de áudio:');
+    }
 }

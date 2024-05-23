@@ -8,10 +8,12 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS audio_files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            voice_name TEXT NOT NULL,
-            audio_text TEXT NOT NULL,
             audio_name TEXT NOT NULL,
-            audio_path TEXT NOT NULL
+            audio_text TEXT NOT NULL,
+            audio_path TEXT NOT NULL,
+            audio_type TEXT NOT NULL,
+            voice_id INTEGER NOT NULL,
+            voice_name TEXT NOT NULL
         )
     ''')
 
@@ -21,13 +23,11 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             voice_name TEXT NOT NULL,
             voice_path TEXT NO NULL,
-            voice_emotion TEXT NOT NULL
+            voice_emotion TEXT NOT NULL,
+            voice_type TEXT NOT NULL,
+            voice_complement INTEGER NOT NULL
         )
     ''')
-    cursor.execute('''
-            INSERT INTO your_table_name (name, emotion)
-            VALUES (?, ?)
-        ''', ('value1', 'value2'))
 
     conn.commit()
     conn.close();
