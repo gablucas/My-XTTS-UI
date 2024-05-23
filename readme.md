@@ -1,5 +1,6 @@
 Python 3.11 (Windows Store)
-Nvida CUDA Toolkit 11.8 or 12.1
+Nvidia CUDA Toolkit 11.8 or 12.1
+Microsoft C++ 14+
 
 python -m venv .venv
 .venv\Scripts\activate
