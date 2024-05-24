@@ -44,12 +44,23 @@ export async function deleteAudio(id, audio_path) {
 
 function filter(e, type) {
     const value = e.target.value;
+    console.log(audiosData)
 
-    if (type === "voice_name" || type === "emotion_name") {
+    if (type === "voice_name") {
         if (value === "all") {
             filterAudiosData = audiosData;
         } else {
-            filterAudiosData = audiosData.filter(x => x[type] === value);
+            filterAudiosData = audiosData.filter(x => x[type].includes(value));
+        }
+
+        ListTextsFilter();
+     }
+
+     if (type === "audio_name") {
+        if (value === "all") {
+            filterAudiosData = audiosData;
+        } else {
+            filterAudiosData = audiosData.filter(x => x[type].includes(value));
         }
 
         ListTextsFilter();
@@ -143,6 +154,6 @@ ListTextsFilter();
 showAudiosFiles(filterAudiosData, deleteAudio, toggleAudio);
 
 filterVoice.addEventListener("change", (e) => filter(e, "voice_name"));
-filterEmotion.addEventListener("change", (e) => filter(e, "emotion_name"));
+filterEmotion.addEventListener("change", (e) => filter(e, "audio_name"));
 filterText.addEventListener("change", (e) => filter(e, "audio_text"));
 generateBtn.addEventListener("click", async () => generateSpeechCallback());
