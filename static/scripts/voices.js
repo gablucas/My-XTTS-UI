@@ -143,7 +143,7 @@ async function generateSpeechCallback() {
         voicesList.push({id: voiceId, name: voiceName });
     });
 
-    await generateSpeech(voicesList, text, 1, "temporary");
+    await generateSpeech(null, voicesList, text, 1, "temporary");
     const audiosData = (await getAudios()).filter(x => x.audio_type === "temporary");
     showAudiosFiles(audiosData)
 }

@@ -1,26 +1,36 @@
 import { getVoices, showAudiosFiles, getAudios, generateSpeech, toggleAudio } from './script.js';
 
-const generateBtn = document.getElementById("generateAudio");
+const generateBtn = document.getElementById('generateAudio');
 const voicesSelect = document.getElementById('voices');
+const emotionsSelect = document.getElementById('emotions');
+const textInput = document.getElementById('text');
+const numberRepeatGenerate = document.getElementById("number");
+
 const filterVoice = document.getElementById('filter_voice');
+const filterEmotion = document.getElementById('filter_emotion');
 const filterText = document.getElementById('filter_text');
 
 const voicesData = (await getVoices()).filter(x => x.voice_type === "permanent");
 const audiosData = (await getAudios()).filter(x => x.audio_type === "permanent");
-console.log(voicesData)
+
+const uniqueVoicesName = Array.from(new Set(voicesData.filter(x => x.voice_complement == 0).map(x => x.voice_name.split('_')[0])));
 
 export let filterAudiosData = audiosData;
 
 async function generateSpeechCallback() {
-    var voices = document.getElementById("voices").value;
-    var text = document.getElementById("text")?.value;
-    var number = document.getElementById("number")?.value;
+    var voice = emotionsSelect.value;
+    var [voiceName, voiceId] = voice.split('_id_');
+    var text = textInput?.value;
+    var number = numberRepeatGenerate?.value;
 
-    const voicesList = [];
-    const [voiceName, voiceId] = voices.split('_id_');
-    voicesList.push({id: voiceId, name: voiceName });
-    
-    await generateSpeech(voicesList, text, number, "permanent");
+    const inferVoice = [voiceName];
+
+    var complementVoices = voicesData.filter(x => x.voice_complement === parseInt(voiceId)).map(x => x.voice_name);
+    complementVoices.forEach(x => {
+        inferVoice.push(x);
+    })
+
+    await generateSpeech(voiceId, inferVoice, text, number, "permanent");
 }
 
 export async function deleteAudio(id, audio_path) {
@@ -36,13 +46,23 @@ export async function deleteAudio(id, audio_path) {
 
 function filter(e, type) {
     const value = e.target.value;
-    console.log(filterAudiosData)
+    console.log(audiosData)
 
     if (type === "voice_name") {
         if (value === "all") {
             filterAudiosData = audiosData;
         } else {
-            filterAudiosData = audiosData.filter(x => x[type] === value);
+            filterAudiosData = audiosData.filter(x => x[type].includes(value));
+        }
+
+        ListTextsFilter();
+     }
+
+     if (type === "audio_name") {
+        if (value === "all") {
+            filterAudiosData = audiosData;
+        } else {
+            filterAudiosData = audiosData.filter(x => x[type].includes(value));
         }
 
         ListTextsFilter();
@@ -62,34 +82,62 @@ function filter(e, type) {
     showAudiosFiles(filterAudiosData, deleteAudio);
 }
 
-async function ListGenerateVoices() {
-    //const voicesDataFiltered = voicesData.filter(x => x.voice_type === "permanent");
+function ListGenerateVoices() {
 
-    voicesData.forEach(audioData => {
+    voicesSelect.addEventListener('input', (e) => ListVoicesEmotions(e.target.value))
+    uniqueVoicesName.forEach(x => {
         const voiceOption = document.createElement('option');
-        
-        const name = audioData.voice_name
-
-        voiceOption.innerHTML = name;
-        voiceOption.value = `${name}_id_${audioData.id}`;
-        
+        voiceOption.innerHTML = x;
+        voiceOption.value = x;
         voicesSelect.appendChild(voiceOption);
     })
 }
 
-async function ListVoicesFilter() {
-    filterVoice.innerHTML = "<option value='all'>All</option>";
-    const uniqueVoicesName = Array.from(new Set(voicesData.map(x => x.voice_name)));
+function ListVoicesEmotions(value) {
 
-    uniqueVoicesName.forEach(data => {
+    emotionsSelect.innerHTML = "";
+
+    voicesData.forEach(x => {
+
+        if (x.voice_name.includes(value)) {
+            const emotionOption = document.createElement('option');
+            console.log(x)
+            emotionOption.innerHTML = x.voice_emotion;
+            emotionOption.value = `${x.voice_name}_id_${x.id}`;
+            emotionsSelect.appendChild(emotionOption);
+        }
+    })
+}
+
+function ListVoicesFilter() {
+    filterVoice.addEventListener('input', (e) => ListEmotionsFilter(e.target.value))
+    filterVoice.innerHTML = "<option value='all'>All</option>";
+    
+    uniqueVoicesName.forEach(x => {
         const filterVoiceOption = document.createElement('option');
-        filterVoiceOption.setAttribute("value", data);
-        filterVoiceOption.innerHTML = data;
+        filterVoiceOption.setAttribute("value", x);
+        filterVoiceOption.innerHTML = x;
         filterVoice.appendChild(filterVoiceOption);
     })
 }
 
-async function ListTextsFilter() {
+function ListEmotionsFilter(value) {
+    filterEmotion.innerHTML = "";
+    filterEmotion.innerHTML = "<option value='all'>All</option>";
+
+    voicesData.forEach(x => {
+
+        if (x.voice_name.includes(value)) {
+            const filterEmotionOption = document.createElement('option');
+            filterEmotionOption.innerHTML = x.voice_emotion;
+            filterEmotionOption.value = x.voice_emotion;
+            filterEmotion.appendChild(filterEmotionOption);
+        }
+    })
+}
+
+
+function ListTextsFilter() {
     filterText.innerHTML = "<option value='all'>All</option>";
 
     const uniqueTextsName = Array.from(new Set(filterAudiosData.map(x => x.audio_text)));
@@ -102,13 +150,13 @@ async function ListTextsFilter() {
     })
 }
 
-await ListGenerateVoices();
-await ListVoicesFilter();
-await ListTextsFilter();
+ListGenerateVoices();
+ListVoicesFilter();
+ListVoicesEmotions(uniqueVoicesName[0])
+ListTextsFilter();
 showAudiosFiles(filterAudiosData, deleteAudio, toggleAudio);
 
-
 filterVoice.addEventListener("change", (e) => filter(e, "voice_name"));
+filterEmotion.addEventListener("change", (e) => filter(e, "audio_name"));
 filterText.addEventListener("change", (e) => filter(e, "audio_text"));
 generateBtn.addEventListener("click", async () => generateSpeechCallback());
-//deleteAllAudiosBtn.addEventListener('click', () => deleteAllAudioFiles('E:\\TTS\\static\\output\\audios\\', [['temporary', "not"]]))

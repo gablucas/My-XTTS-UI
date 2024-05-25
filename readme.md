@@ -10,7 +10,5 @@
 - pip install TTS
 - pip install pedalboard
 - pip install noisereduce
-
-- For CUDA 11.8 / pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-
-- For CUDA 12.1 / pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+- pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu118 - For CUDA 11.8
+- pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu121 - For CUDA 12.1
