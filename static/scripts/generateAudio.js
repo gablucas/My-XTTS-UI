@@ -13,7 +13,7 @@ const filterText = document.getElementById('filter_text');
 const voicesData = (await getVoices()).filter(x => x.voice_type === "permanent");
 const audiosData = (await getAudios()).filter(x => x.audio_type === "permanent");
 
-const uniqueVoicesName = Array.from(new Set(voicesData.map(x => x.voice_name.split('_')[0])));
+const uniqueVoicesName = Array.from(new Set(voicesData.filter(x => x.voice_complement == 0).map(x => x.voice_name.split('_')[0])));
 
 export let filterAudiosData = audiosData;
 
@@ -22,13 +22,15 @@ async function generateSpeechCallback() {
     var [voiceName, voiceId] = voice.split('_id_');
     var text = textInput?.value;
     var number = numberRepeatGenerate?.value;
-    console.log(voice)
-    console.log(voiceName + " " + voiceId)
 
-    const voicesList = [];
-    voicesList.push({ id: voiceId, name: voiceName });
-    
-    await generateSpeech(voicesList, text, number, "permanent");
+    const inferVoice = [voiceName];
+
+    var complementVoices = voicesData.filter(x => x.voice_complement === parseInt(voiceId)).map(x => x.voice_name);
+    complementVoices.forEach(x => {
+        inferVoice.push(x);
+    })
+
+    await generateSpeech(voiceId, inferVoice, text, number, "permanent");
 }
 
 export async function deleteAudio(id, audio_path) {
@@ -133,6 +135,7 @@ function ListEmotionsFilter(value) {
         }
     })
 }
+
 
 function ListTextsFilter() {
     filterText.innerHTML = "<option value='all'>All</option>";

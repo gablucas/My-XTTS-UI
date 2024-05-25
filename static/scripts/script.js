@@ -124,7 +124,7 @@ export async function getVoices() {
     return data;
 }
 
-export async function generateSpeech(voicesList, text, number, type) {
+export async function generateSpeech(voiceId, voicesList, text, number, type) {
 
     if (text === undefined || text === "") {
         text = "I'm doing a test to see how my voice sounds in this inference, well. It seems good?"
@@ -134,17 +134,33 @@ export async function generateSpeech(voicesList, text, number, type) {
         number = "1";
     }
 
-    try {
-        const response = await fetch(`/audio_files`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ voicesList: voicesList, text: text, number: number, type: type }),
-        })
-    } 
-    catch 
-    {
-        console.log('Erro ao obter arquivos de áudio:');
+    if (voiceId !== null) {
+        try {
+            const response = await fetch(`/audio_files`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: voiceId, voicesList: voicesList, text: text, number: number, type: type }),
+            })
+        } 
+        catch 
+        {
+            console.log('Erro ao obter arquivos de áudio:');
+        }
+    } else {
+        try {
+            const response = await fetch(`/audio_files_many`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({voicesList: voicesList, text: text, number: number, type: type }),
+            })
+        } 
+        catch 
+        {
+            console.log('Erro ao obter arquivos de áudio:');
+        }
     }
 }
