@@ -1,5 +1,8 @@
 import os
 from flask import Blueprint, jsonify, current_app, request
+from pedalboard.io import AudioFile
+from pedalboard import *
+import noisereduce as nr
 import torch
 import torchaudio
 from db.audios_db import save_audio_db, get_audios, delete_audio_db
@@ -35,10 +38,26 @@ def create_audio_file():
             temperature=0.7,  # Adicione parâmetros personalizados aqui
         )
         
+        print("Audio generated...")
         audio_name = voice[0].split('_voice_')[0]
         base_name, output_path = get_unique_output_path("static/output/audios", audio_name)
         torchaudio.save(output_path, torch.tensor(out["wav"]).unsqueeze(0), 24000)
 
+        print("Enhancing audio...")
+        sr = 44100
+        with AudioFile(output_path).resampled_to(sr) as f:
+            audio = f.read(f.frames)
+
+            reduced_noise = nr.reduce_noise(y=audio, sr=sr, stationary=True, prop_decrease=0.75)
+            
+            board = Pedalboard([])
+
+            effected = board(reduced_noise, sr)
+
+            with AudioFile(output_path, 'w', sr, effected.shape[0]) as f:
+                f.write(effected)
+
+        print("Audio infos saved on DB...")
         save_audio_db(base_name, speech, output_path, type, id, voice[0])
         print(f"Saved audio at: {output_path}")
             
