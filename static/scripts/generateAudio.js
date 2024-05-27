@@ -33,15 +33,18 @@ async function generateSpeechCallback() {
     await generateSpeech(voiceId, inferVoice, text, number, "permanent");
 }
 
-export async function deleteAudio(id, audio_path) {
-    console.log(id + " " + audio_path)
+export async function deleteAudio(id, audio_path, name) {
+
     const response = await fetch("/audio_files", {
         method: "DELETE",
         headers: {
             'Content-Type': "application/json"
         },
-        body: JSON.stringify({id: id, audio_path: audio_path})
+        body: JSON.stringify({id: id, path: audio_path})
     });
+
+    const audioElement = document.querySelector(`.${name}`);
+    audioElement.remove();
 }
 
 function filter(e, type) {

@@ -72,17 +72,25 @@ export function showAudiosFiles(audiosData, deleteFunction, toggleAudio) {
         const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, null, "play_arrow")
         const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, null, "pause");
         const audioDelete = generateElement('span', ["audio-button-delete", "material-symbols-outlined"], null, null, "delete");
+        const audioDownload = generateElement('span', ["audio-button-download", "material-symbols-outlined"], null, null, "download");
 
         const audio = new Audio(path);
         audio.controls = true
 
-        audioPlay.addEventListener('click', (e) => toggleAudio(audio, name, "play"))
-        audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"))
-        audioDelete.addEventListener('click', () => deleteFunction(audioData.id, audioData.audio_path))
+        audioPlay.addEventListener('click', (e) => toggleAudio(audio, name, "play"));
+        audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"));
+        audioDelete.addEventListener('click', () => deleteFunction(audioData.id, audioData.audio_path, name));
+        audioDownload.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.href = path; // caminho do arquivo de áudio
+            link.download = name; // nome do arquivo de áudio
+            link.click();
+        });
         
         audioActionsContainer.appendChild(audioPlay);
         audioActionsContainer.appendChild(audioPause);
         audioActionsContainer.append(audioDelete);
+        audioActionsContainer.appendChild(audioDownload);
         audioContainer.appendChild(audioName);
         audioContainer.appendChild(audioActionsContainer);
 

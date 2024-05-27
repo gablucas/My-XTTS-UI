@@ -58,7 +58,7 @@ async function showVoices() {
         const voiceContainer = generateElement('div', ["temporary_voice", "primary-container", "vertical-elements"], null, {name: "data-voice", value: `${x.voice_name}_voice_${x.id}`}, null);
         const voiceName = generateElement('span', null, null, null, x.voice_name);
         const emotionSelect = generateElement('select', null, `select-voice-${x.id}`, null, null);
-        const audioFileContainer = generateElement('div', null, `audio_cotainer_voice_${x.id}`, null, null);
+        const audioFileContainer = generateElement('div', ['vertical-elements'], `audio_cotainer_voice_${x.id}`, null, null);
 
         const emotionOption = generateElement('option', null, null, null, "None");
         emotionOption.setAttribute('value', 0);
@@ -79,18 +79,24 @@ async function showVoices() {
 }
 
 export async function showAudiosFiles() {
+
     const audiosData = (await getAudios()).filter(x => x.audio_type === "temporary");
     const voicesData = (await getVoices()).filter(x => x.voice_type === "temporary");
 
     const voiceContainer = document.querySelectorAll(".temporary_voice");
     
     voiceContainer.forEach((container) => {
+        
         const voiceId = container.getAttribute('data-voice').split("_voice_")[1];
-        const voice = voicesData.find(x => x.id === parseInt(voiceId));
+        const audiosContainer = container.querySelector(`#audio_cotainer_voice_${voiceId}`);
+        const audioHandlerContainer = container.querySelector('.audio-handler');
 
+        const voice = voicesData.find(x => x.id === parseInt(voiceId));
         const audios = audiosData.filter(x => x.voice_id === parseInt(voiceId));
 
-        audios.forEach(audioData => {
+        audiosContainer.innerHTML = "";
+
+        audios.forEach((audioData, index) => {
             const name = audioData.audio_name;
             const path = audioData.audio_path;
     
@@ -99,32 +105,32 @@ export async function showAudiosFiles() {
             const audioName = generateElement('span', null, null, null, name, null);
             const audioPlay = generateElement('span', ["audio-button-play", "material-symbols-outlined"], null, null, "play_arrow")
             const audioPause = generateElement('span', ["audio-button-pause", "hide", "material-symbols-outlined"], null, null, "pause");
-            
-            const voiceSaveOrDeleteContainer =  generateElement('div', ['horizontal-elements'], null, null, null);
-            const voiceSave = generateElement('button', ['grow'], 'voice-save', null, "Salvar");
-            const voiceDelete = generateElement('button', ['grow'], 'voice-save', null, "Deletar");
-    
             const audio = new Audio(path);
             audio.controls = true
     
             audioPlay.addEventListener('click', (e) => toggleAudio(audio, name, "play"))
             audioPause.addEventListener('click', (e) => toggleAudio(audio, name, "pause"))
 
-            // PAREI AQUI
-            voiceSave.addEventListener('click', (e) => updateVoiceAndAudio(e, {id: voice.id}, {id: audioData.id, path: audioData.audio_path}));
-            voiceDelete.addEventListener('click', (e) => deleteVoiceAndAudio(e, {id: voice.id, path: voice.voice_path}, {id: audioData.id, path: audioData.audio_path}));
-
-            voiceSaveOrDeleteContainer.appendChild(voiceSave);
-            voiceSaveOrDeleteContainer.appendChild(voiceDelete);
-            
             audioActionsContainer.appendChild(audioPlay);
             audioActionsContainer.appendChild(audioPause);
-            //audioActionsContainer.append(audioDelete);
             audioContainer.appendChild(audioName);
             audioContainer.appendChild(audioActionsContainer);
-            
-            container.appendChild(audioContainer);
-            container.appendChild(voiceSaveOrDeleteContainer);
+
+
+            audiosContainer.appendChild(audioContainer);
+
+            if (index === audios.length - 1 && audioHandlerContainer === null) {
+                const voiceSaveOrDeleteContainer =  generateElement('div', ['audio-handler' ,'horizontal-elements'], null, null, null);
+                const voiceSave = generateElement('button', ['grow'], 'voice-save', null, "Salvar");
+                const voiceDelete = generateElement('button', ['grow'], 'voice-save', null, "Deletar");
+        
+                voiceSave.addEventListener('click', (e) => updateVoiceAndAudio(e, {id: voice.id}, {id: audioData.id, path: audioData.audio_path}));
+                voiceDelete.addEventListener('click', (e) => deleteVoiceAndAudio(e, {id: voice.id, path: voice.voice_path}, {id: audioData.id, path: audioData.audio_path}));
+        
+                voiceSaveOrDeleteContainer.appendChild(voiceSave);
+                voiceSaveOrDeleteContainer.appendChild(voiceDelete);
+                container.appendChild(voiceSaveOrDeleteContainer);
+            }
         })
     });
 }
